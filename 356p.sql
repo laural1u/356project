@@ -122,7 +122,7 @@ CREATE TABLE has_details (
         PRIMARY KEY (course_uuid, course_offering_uuid, section_uuid, room_uuid, schedule_uuid)
         FOREIGN KEY (course_uuid, course_offering_uuid) REFERENCES Offerings(course_id, uuid),
         FOREIGN KEY (section_uuid, room_uuid, schedule_uuid) REFERENCES Sections(uuid, room_uuid, schedule_uuid)
-)
+)       -- inner join Sections and Offerings on course_offering_uuid to get this table
 
 --OpenCourse
 
@@ -147,7 +147,7 @@ CREATE TABLE Assessments(
                         FOREIGN KEY (code_module, code_presentation) REFERENCES OpenCourses(code_module, code_presentation)
 );
 
-CREATE TABLE studentAssessment(
+CREATE TABLE StudentAssessment(
                         id_assessment                   int,
                         id_student                      int,
                         date_submitted                  int,
@@ -157,7 +157,21 @@ CREATE TABLE studentAssessment(
                         PRIMARY KEY (id_assessment, id_student),
                         FOREIGN KEY (id_assessment) REFERENCES Assessments(id_assessment),
                         FOREIGN KEY (id_student) REFERENCES StudentInfo(id_student)
-);      -- treat this table as relation has_grade
+);
+
+CREATE TABLE has_grade(
+                        code_module	                varchar(3),
+                        code_presentation	        varchar(5),
+                        id_assessment                   int,
+                        id_student                      int,
+                        date_submitted                  int,
+                        is_banked                       tinyint(1),
+                        score                           int,
+
+                        PRIMARY KEY (code_module, code_presentation, id_assessment, id_student),
+                        FOREIGN KEY (code_module, code_presentation) REFERENCES OpenCourses(code_module, code_presentation),
+                        FOREIGN KEY (id_assessment, id_student) REFERENCES StudentAssessment(id_assessment, id_student)
+);      -- inner join StudentAssessment and Assessments on id_assessment to get this table
 
 CREATE TABLE StudentInfo(
                         code_module	                varchar(3),
