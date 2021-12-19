@@ -36,7 +36,7 @@ CREATE TABLE Subjects(
 CREATE TABLE Sections(
                         uuid	                varchar(36),
 			course_offering_uuid	varchar(36),
-			section_type            varchar(5),
+			section_type            char(5),
 			number                  int,
                         room_uuid               varchar(36),
                         schedule_uuid           varchar(36),
@@ -48,7 +48,7 @@ CREATE TABLE Sections(
 );
 
 CREATE TABLE Instructors(
-                        id              varchar(10),
+                        id              char(10),
                         name            varchar(36),
 
                         PRIMARY KEY (id)
@@ -72,8 +72,8 @@ CREATE TABLE Schedules(
 
 CREATE TABLE Rooms(
 			uuid	        varchar(36),
-                        facility_code	varchar(10),
-			room_code       varchar(10),
+                        facility_code	char(10),
+			room_code       char(10),
 
                         PRIMARY KEY (uuid),
 );
@@ -95,8 +95,8 @@ CREATE TABLE Grades(
 );      -- treat this table as relation counts
 
 CREATE TABLE Teachings (
-        instructor_id,
-        section_uuid,
+        instructor_id,		char(10),
+        section_uuid,		varchar(36),
 
         PRIMARY KEY (instructor_id, section_uuid),
         FOREIGN KEY (instructor_id) REFERENCES Instructors(id),
@@ -104,8 +104,8 @@ CREATE TABLE Teachings (
 )       -- treat this table as relation teaches
 
 CREATE TABLE SubjectMemberships (
-        subject_code,
-        course_offering_uuid,
+        subject_code,		int,
+        course_offering_uuid,	varchar(36),
 
         PRIMARY KEY (subject_code, course_offering_uuid),
         FOREIGN KEY (subject_code) REFERENCES Subjects(code),
@@ -113,11 +113,11 @@ CREATE TABLE SubjectMemberships (
 )       -- treat this table as relation offers
 
 CREATE TABLE has_details (
-        course_uuid,
-        course_offering_uuid,
-        section_uuid,
-        room_uuid,
-        schedule_uuid,
+        course_uuid,			varchar(36),
+        course_offering_uuid,		varchar(36),
+        section_uuid,			varchar(36),
+        room_uuid,			varchar(36),
+        schedule_uuid,			varchar(36),
 
         PRIMARY KEY (course_uuid, course_offering_uuid, section_uuid, room_uuid, schedule_uuid)
         FOREIGN KEY (course_uuid, course_offering_uuid) REFERENCES Offerings(course_id, uuid),
@@ -127,19 +127,19 @@ CREATE TABLE has_details (
 --OpenCourse
 
 CREATE TABLE OpenCourses(
-			code_module	                varchar(3),
-                        code_presentation	        varchar(5),
-			module_presentation_length      varchar(10),
+			code_module	                char(3),
+                        code_presentation	        char(5),
+			module_presentation_length      int,
 
                         PRIMARY KEY (code_module, code_presentation),
                         FOREIGN KEY (code_module) REFERENCES Courses(name)
 );
 
 CREATE TABLE Assessments(
-			code_module	                varchar(3),
-                        code_presentation	        varchar(5),
+			code_module	                char(3),
+                        code_presentation	        char(5),
                         id_assessment                   int,
-                        assessment_type                 varchar(5),
+                        assessment_type                 char(5),
                         date                            int,
                         weight                          int,
 
@@ -160,8 +160,8 @@ CREATE TABLE StudentAssessment(
 );
 
 CREATE TABLE has_grade(
-                        code_module	                varchar(3),
-                        code_presentation	        varchar(5),
+                        code_module	                char(3),
+                        code_presentation	        char(5),
                         id_assessment                   int,
                         id_student                      int,
                         date_submitted                  int,
@@ -174,8 +174,8 @@ CREATE TABLE has_grade(
 );      -- inner join StudentAssessment and Assessments on id_assessment to get this table
 
 CREATE TABLE StudentInfo(
-                        code_module	                varchar(3),
-                        code_presentation	        varchar(5),
+                        code_module	                char(3),
+                        code_presentation	        char(5),
                         id_student                      int,
                         gender                          char(1),
                         region                          varchar(20),
@@ -190,8 +190,8 @@ CREATE TABLE StudentInfo(
 );
 
 CREATE TABLE StudentRegistration(
-                        code_module	                varchar(3),
-                        code_presentation	        varchar(5),
+                        code_module	                char(3),
+                        code_presentation	        char(5),
                         id_student                      int,
                         date_registration               int,
                         date_unregistration             int,
@@ -203,8 +203,8 @@ CREATE TABLE StudentRegistration(
 
 
 CREATE TABLE Vle(
-                        code_module	                varchar(3),
-                        code_presentation	        varchar(5),
+                        code_module	                char(3),
+                        code_presentation	        char(5),
                         id_site                         int,
                         activity_type                   varchar(10),
                         week_from                       int,
@@ -215,8 +215,8 @@ CREATE TABLE Vle(
 );      -- treat this table as relation has_vle as well
 
 CREATE TABLE StudentVle(
-                        code_module	                varchar(3),
-                        code_presentation	        varchar(5),
+                        code_module	                char(3),
+                        code_presentation	        char(5),
                         id_student                      int,
                         id_site                         int,
                         date                            int,
@@ -240,11 +240,11 @@ CREATE TABLE CourseraCourses (
 )
 
 CREATE TABLE Reviews (
-        reviews,
-        reviewers,
-        date_reviews,
-        rating,
-        course_id,
+        reviews,		varchar(50),
+        reviewers,		varchar(20),
+        date_reviews,		varchar(10),
+        rating,			int
+        course_id,		varchar(20),
 
         PRIMARY KEY (reviewers, date_reviews, course_id),
         FOREIGN KEY (course_id) REFERENCES CourseraCourses(course_id)
