@@ -291,43 +291,10 @@ create view has_grade as (
      (Assessments inner join StudentAssessment using (id_assessment))
 );
 ---------------------------------------------------------------------------------------------
-CREATE TABLE CourseraCourses (
-        name                    varchar(150),
-        institution             varchar(100),
-        course_url              varchar(150),
-        course_id               varchar(150),
-
-        PRIMARY KEY (course_id)
-);
-load data infile '/var/lib/mysql-files/26-Education/Coursera/Coursera_courses.csv' ignore into table CourseraCourses
-     fields terminated by ','
-     enclosed by '"'
-     lines terminated by '\n'
-     ignore 1 lines;
-
-CREATE TABLE Reviews (
-        reviews               varchar(7000),
-        reviewers             varchar(50),
-        date_reviews          varchar(20),
-        rating                int,
-        course_id             varchar(150),
-
-        PRIMARY KEY (reviewers, date_reviews, rating, course_id, reviews)
-);   -- treat as relation has_review
-load data infile '/var/lib/mysql-files/26-Education/Coursera/Coursera_reviews.csv' ignore into table Reviews
-     fields terminated by ','
-     enclosed by '"'
-     lines terminated by '\n'
-     ignore 1 lines;
-     -- ignore 1455500 lines;
-alter table Reviews add foreign key (course_id) references CourseraCourses(course_id); -- has course_id not in CourseraCourses
-
 create view Courses as (
      select name from (
           (select name from CourseraCourses)
           UNION
           (select name from MadisonCourses)
-          UNION
-          (select code_module as name from OpenCourses)
      ) as T
 );
