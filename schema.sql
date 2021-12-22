@@ -95,7 +95,7 @@ CREATE TABLE Grades(
                         s_count                 int not null,
 
                         PRIMARY KEY (course_offering_uuid, section_number)
-);   --treat as relation couts
+);   -- treat as relation couts
 load data infile '/var/lib/mysql-files/26-Education/UWM/grade_distributions.csv' ignore into table Grades
      fields terminated by ','
      enclosed by '"'
@@ -297,7 +297,7 @@ create view has_grade as (
      select code_module, code_presentation, id_assessment, id_student, date_submitted, is_banked, score from 
      (Assessments inner join StudentAssessment using (id_assessment))
 );
----------------------------------------------------------------------------------------------
+-- -------------------------------------------------------------------------------------------
 create view Courses as (
      select name from (
           (select name from CourseraCourses)
