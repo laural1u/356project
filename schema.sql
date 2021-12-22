@@ -81,6 +81,7 @@ load data infile '/var/lib/mysql-files/26-Education/UWM/instructors.csv' ignore 
      enclosed by '"'
      lines terminated by '\n'
      ignore 1 lines;
+CREATE INDEX idx_name ON Instructors(name);
 
 CREATE TABLE Grades(
                         course_offering_uuid    char(36),
@@ -113,6 +114,7 @@ load data infile '/var/lib/mysql-files/26-Education/UWM/teachings.csv' ignore in
      enclosed by '"'
      lines terminated by '\n'
      ignore 1 lines;
+CREATE INDEX idx_section ON Teachings(section_uuid);
 
 CREATE TABLE SubjectMemberships (
         subject_code            char(3),
@@ -139,6 +141,9 @@ load data infile '/var/lib/mysql-files/26-Education/UWM/course_offerings.csv' ig
      enclosed by '"'
      lines terminated by '\n'
      ignore 1 lines;
+CREATE INDEX idx_course ON Offerings(course_uuid);
+CREATE INDEX idx_name ON Offerings(name);
+
 
 CREATE TABLE Sections(
                         uuid                    char(36),
@@ -155,6 +160,7 @@ load data infile '/var/lib/mysql-files/26-Education/UWM/sections.csv' ignore int
      enclosed by '"'
      lines terminated by '\n'
      ignore 1 lines;
+CREATE INDEX idx_offering ON Sections(course_offering_uuid);
 
 create view offers as (
      select MadisonCourses.name as course_name, term_code, Subjects.name as subject_name, Offerings.name as offer_name from 
@@ -196,6 +202,7 @@ load data infile '/var/lib/mysql-files/26-Education/OU/assessments.csv' ignore i
      ignore 1 lines
      (code_module, code_presentation, id_assessment, assessment_type, @date, weight)
      set date = ifnull(-1, @date);
+CREATE INDEX idx_module_presen ON Assessments(code_module, code_presentation);
 
 CREATE TABLE StudentAssessment(
                         id_assessment                   int,
@@ -215,8 +222,8 @@ load data infile '/var/lib/mysql-files/26-Education/OU/studentAssessment.csv' ig
      set 
           is_banked = if(@is_banked='True', 1, 0),
           score = ifnull(0, @score);
+CREATE INDEX idx_stu_assess ON StudentAssessment(id_student, id_assessment);
 
--- lost some data
 CREATE TABLE StudentInfo(
                         code_module                     char(3) not null,
                         code_presentation               char(5) not null,
@@ -236,6 +243,7 @@ load data infile '/var/lib/mysql-files/26-Education/OU/studentInfo.csv' ignore i
      enclosed by '"'
      lines terminated by '\r\n'
      ignore 1 lines;
+CREATE INDEX idx_module_presen ON StudentInfo(code_module, code_presentation);
 
 CREATE TABLE StudentRegistration(
                         code_module                     char(3),
@@ -255,6 +263,8 @@ load data infile '/var/lib/mysql-files/26-Education/OU/studentRegistration.csv' 
      set 
           date_registration = ifnull(99999, @date_registration),
           date_unregistration = ifnull(99999, @date_unregistration);
+CREATE INDEX idx_module_presen ON StudentRegistration(code_module, code_presentation);
+CREATE INDEX idx_student ON StudentRegistration(id_student);
 
 CREATE TABLE Vle(
                         id_site                         int,
@@ -264,7 +274,8 @@ CREATE TABLE Vle(
                         week_from                       int,
                         week_to                         int,
 
-                        PRIMARY KEY (id_site, code_module, code_presentation)
+                        PRIMARY KEY (id_site, code_module, code_presentation),
+                        FOREIGN KEY (code_module, code_presentation) references OpenCourses(code_module, code_presentation)
 );
 load data infile '/var/lib/mysql-files/26-Education/OU/vle.csv' ignore into table Vle
      fields terminated by ','
@@ -275,7 +286,7 @@ load data infile '/var/lib/mysql-files/26-Education/OU/vle.csv' ignore into tabl
      set
         week_from = ifnull(-1, @week_from),
         week_to = ifnull(-1, @week_to);
-alter table Vle add foreign key (code_module, code_presentation) references OpenCourses(code_module, code_presentation);     -- has invalid key
+CREATE INDEX idx_module_presen ON Vle(code_module, code_presentation);
 
 CREATE TABLE StudentVle(
                         code_module                     char(3),
@@ -292,6 +303,9 @@ load data infile '/var/lib/mysql-files/26-Education/OU/studentVle.csv' ignore in
      enclosed by '"'
      lines terminated by '\n'
      ignore 1 lines;
+CREATE INDEX idx_module_presen ON StudentVle(code_module, code_presentation);
+CREATE INDEX idx_student ON StudentVle(id_student);
+CREATE INDEX idx_site ON StudentVle(id_site);
 
 create view has_grade as (
      select code_module, code_presentation, id_assessment, id_student, date_submitted, is_banked, score from 
