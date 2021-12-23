@@ -25,7 +25,7 @@ load data infile '/var/lib/mysql-files/26-Education/UWM/subjects.csv' ignore int
      enclosed by '"'
      lines terminated by '\n'
      ignore 1 lines;
-CREATE INDEX idx_abbr ON MadisonCourses(abbreviation);
+CREATE INDEX idx_abbr ON Subjects(abbreviation);
 
 CREATE TABLE Rooms(
                         uuid            char(36),
@@ -39,7 +39,7 @@ load data infile '/var/lib/mysql-files/26-Education/UWM/rooms.csv' ignore into t
      enclosed by '"'
      lines terminated by '\n'
      ignore 1 lines;
-CREATE INDEX idx_abbr ON MadisonCourses(abbreviation);
+CREATE INDEX idx_room ON Rooms(facility_code, room_code);
 
 CREATE TABLE Schedules(
                         uuid            char(36),
@@ -95,7 +95,9 @@ CREATE TABLE Grades(
                         f_count                 int not null,
                         s_count                 int not null,
 
-                        PRIMARY KEY (course_offering_uuid, section_number)
+                        PRIMARY KEY (course_offering_uuid, section_number),
+                        FOREIGN KEY (course_offering_uuid) references Offerings(uuid),
+                        FOREIGN KEY (section_number) references Sections(number)
 );   --treat as relation couts
 load data infile '/var/lib/mysql-files/26-Education/UWM/grade_distributions.csv' ignore into table Grades
      fields terminated by ','
@@ -153,14 +155,13 @@ CREATE TABLE Sections(
                         room_uuid               char(36) not null,
                         schedule_uuid           char(36) not null,
 
-                        PRIMARY KEY (uuid)
+                        PRIMARY KEY (uuid, course_offering_uuid, room_uuid, schedule_uuid)
 );   -- treat as relation has_details
 load data infile '/var/lib/mysql-files/26-Education/UWM/sections.csv' ignore into table Sections
      fields terminated by ','
      enclosed by '"'
      lines terminated by '\n'
      ignore 1 lines;
-CREATE INDEX idx_offering ON Sections(course_offering_uuid);
 
 create view offers as (
      select MadisonCourses.name as course_name, term_code, Subjects.name as subject_name, Offerings.name as offer_name from 
@@ -188,7 +189,7 @@ CREATE TABLE Assessments(
                         code_presentation               char(5) not null,
                         id_assessment                   int,
                         assessment_type                 char(4) not null,
-                        date                            int,
+                        date                            int not null,
                         weight                          int not null,
 
                         PRIMARY KEY (id_assessment),
@@ -253,7 +254,7 @@ CREATE TABLE StudentRegistration(
                         date_unregistration             int,
 
                         PRIMARY KEY (id_student, code_module, code_presentation)
-);   -- treate as replation registers
+);   -- treat as relation registers
 load data infile '/var/lib/mysql-files/26-Education/OU/studentRegistration.csv' ignore into table StudentRegistration
      fields terminated by ','
      enclosed by '"'
@@ -276,7 +277,7 @@ CREATE TABLE Vle(
 
                         PRIMARY KEY (id_site, code_module, code_presentation),
                         FOREIGN KEY (code_module, code_presentation) references OpenCourses(code_module, code_presentation)
-);
+);   -- treat as relation has_vle
 load data infile '/var/lib/mysql-files/26-Education/OU/vle.csv' ignore into table Vle
      fields terminated by ','
      enclosed by '"'
@@ -314,7 +315,7 @@ create view has_grade as (
 ---------------------------------------------------------------------------------------------
 create view Courses as (
      select name from (
-          (select name from CourseraCourses)
+          (select code_module as name from OpenCourses)
           UNION
           (select name from MadisonCourses)
      ) as T
