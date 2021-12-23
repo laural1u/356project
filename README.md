@@ -1,10 +1,12 @@
 # 356project
-to run this code, you need have do the following
+to run the client, you need to install the following packge
 
 ```console
 pip3 install mysql-connector-python
 pip3 install tabulate
+```
+to run the code
+```console
 python3 client.py
 ```
-
 
