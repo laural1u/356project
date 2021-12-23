@@ -2,16 +2,16 @@ import mysql.connector
 from tabulate import tabulate
 
 
-cnx = mysql.connector.connect(
-    user="root", password="ece356-", host="127.0.0.1", database="c455li"
-)
-
 # cnx = mysql.connector.connect(
-#     user="c455li",
-#     password="ECE356-c455li",
-#     host="marmoset04.shoshin.uwaterloo.ca",
-#     database="db356_c455li",
+#     user="root", password="ece356-", host="127.0.0.1", database="c455li"
 # )
+
+cnx = mysql.connector.connect(
+    user="c455li",
+    password="ECE356-c455li",
+    host="marmoset04.shoshin.uwaterloo.ca",
+    database="db356_c455li",
+)
 
 if cnx.is_connected():
     print("database Connected")
@@ -82,12 +82,12 @@ class FunctionNode(Node):
         values = {}
         for value_name in self.value_names:
             print("what is " + value_name.replace("_", " ") + "?")
-            # values[value_name.replace(" ", "_")] = input()
-            values[value_name.replace(" ", "_")] = "1"
+            values[value_name.replace(" ", "_")] = input()
+            # values[value_name.replace(" ", "_")] = "1"
         print(self.query % values)
         print(values)
         exe_query = self.query % values
-        # cursor.execute(exe_query)
+        cursor.execute(exe_query)
 
         if self.result_names == None:
             # cnx.commit()
@@ -468,7 +468,7 @@ if __name__ == "__main__":
             ("#_of_submission", "average", "min", "max"),
         )
     )
-    
+
     # vii
     oc_student_VLE = open_course.create_option_child("student VLE")
 
@@ -490,10 +490,9 @@ if __name__ == "__main__":
             ),
         )
     )
-    
-    ### madixon course
-    madixon_course = select_course.create_option_child("madixon course")
 
+    ### madison course
+    madixon_course = select_course.create_option_child("madixon course")
     
     mc_course = madixon_course.create_option_child("Course")
 
